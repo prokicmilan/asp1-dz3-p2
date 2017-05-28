@@ -134,6 +134,29 @@ int* dijkstra(int** graph, int nodes, int start, int end, int** prev) {
 	return distance;
 }
 
+void cpyGraph(int** dst, int** src, int nodes) {
+	int i, j;
+
+	if (dst != NULL) {
+		return;
+	}
+	dst = malloc(sizeof(int*)* nodes);
+	if (dst == NULL) {
+		exit(1);
+	}
+	for (i = 0; i < nodes; i++) {
+		dst[i] = malloc(sizeof(int)* nodes);
+		if (dst[i] == NULL) {
+			exit(1);
+		}
+	}
+	for (i = 0; i < nodes; i++) {
+		for (j = 0; j < nodes; j++) {
+			dst[i][j] = src[i][j];
+		}
+	}
+}
+
 void shortestPath(int** graph, int nodes, int* cost) {
 	int start;
 	int end;
@@ -141,8 +164,13 @@ void shortestPath(int** graph, int nodes, int* cost) {
 	int sum;
 	int* prev = NULL;
 	int* distance = NULL;
+	int** tmpGraph = NULL;
 	int i, j;
 
+	if (graph == NULL) {
+		printf("Graf ne postoji\n");
+		return;
+	}
 	printf("Unesite pocetni i krajnji cvor i sumu novca koji je na raspolaganju: ");
 	scanf("%d%d%d", &start, &end, &money);
 	if (start < 0 || start >= nodes || end < 0 || end >= nodes) {
@@ -179,12 +207,29 @@ void shortestPath(int** graph, int nodes, int* cost) {
 		i = prev[i];
 		printf("<-%d", i);
 	}
-	printf("\n Duzina je %d, cena %d\n", distance[end], sum);
+	printf("\nDuzina je %d, cena %d\n", distance[end], sum);
+}
+
+int** deleteGraph(int** graph, int* nodes, int* edges, int** cost) {
+	int i;
+
+	for (i = 0; i < *nodes; i++) {
+		free(graph[i]);
+		graph[i] = NULL;
+	}
+	free(graph);
+	graph = NULL;
+	free(*cost);
+	*cost = NULL;
+	*nodes = *edges = 0;
+
+	return graph;
 }
 
 void printMenu() {
 	printf("1. Ucitavanje grafa\n");
 	printf("2. Odredjivanje najkraceg puta\n");
+	printf("3. Brisanje grafa\n");
 	printf("0. Kraj rada\n");
 }
 
@@ -195,28 +240,29 @@ int main(void) {
 	int* cost = NULL;
 	int** graph = NULL;
 	bool radi;
-
-	int i;
-
+	
+	nodes = 0;
+	edges = 0;
 	radi = true;
 	while (radi) {
 		printMenu();
 		scanf("%d", &choice);
 		switch (choice) {
 		case 1:
-			graph = loadGraph(&nodes, &edges, &cost);
-			printf("Uneti graf:\n");
-			printGraph(graph, nodes);
-			printf("\nCene pridruzene cvorovima:\n");
-			for (i = 0; i < nodes; i++) {
-				printf("%d ", cost[i]);
+			if (graph != NULL) {
+				graph = deleteGraph(graph, &nodes, &edges, &cost);
+
 			}
-			printf("\n");
+			graph = loadGraph(&nodes, &edges, &cost);
 			break;
 		case 2:
 			shortestPath(graph, nodes, cost);
 			break;
+		case 3:
+			graph = deleteGraph(graph, &nodes, &edges, &cost);
+			break;
 		case 0:
+			deleteGraph(graph, &nodes, &edges, &cost);
 			radi = false;
 			break;
 		default:
