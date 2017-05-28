@@ -79,7 +79,7 @@ int** loadGraph(int* n, int* e, int** costs) {
 int* dijkstra(int** graph, int nodes, int start, int end, int** prev) {
 	int* distance;
 	int* visited;
-	int i, j;
+	int i;
 	int nextNode;
 	int minDistance;
 	int count;
@@ -134,25 +134,25 @@ int* dijkstra(int** graph, int nodes, int start, int end, int** prev) {
 	return distance;
 }
 
-void cpyGraph(int** dst, int** src, int nodes) {
+void cpyGraph(int*** dst, int** src, int nodes) {
 	int i, j;
 
-	if (dst != NULL) {
+	if (*dst != NULL) {
 		return;
 	}
-	dst = malloc(sizeof(int*)* nodes);
-	if (dst == NULL) {
+	*dst = malloc(sizeof(int*)* nodes);
+	if (*dst == NULL) {
 		exit(1);
 	}
 	for (i = 0; i < nodes; i++) {
-		dst[i] = malloc(sizeof(int)* nodes);
-		if (dst[i] == NULL) {
+		(*dst)[i] = malloc(sizeof(int)* nodes);
+		if ((*dst)[i] == NULL) {
 			exit(1);
 		}
 	}
 	for (i = 0; i < nodes; i++) {
 		for (j = 0; j < nodes; j++) {
-			dst[i][j] = src[i][j];
+			(*dst)[i][j] = src[i][j];
 		}
 	}
 }
@@ -171,6 +171,7 @@ void shortestPath(int** graph, int nodes, int* cost) {
 		printf("Graf ne postoji\n");
 		return;
 	}
+	cpyGraph(&tmpGraph, graph, nodes);
 	printf("Unesite pocetni i krajnji cvor i sumu novca koji je na raspolaganju: ");
 	scanf("%d%d%d", &start, &end, &money);
 	if (start < 0 || start >= nodes || end < 0 || end >= nodes) {
@@ -179,7 +180,7 @@ void shortestPath(int** graph, int nodes, int* cost) {
 	}
 	while (true) {
 		sum = 0;
-		distance = dijkstra(graph, nodes, start, end, &prev);
+		distance = dijkstra(tmpGraph, nodes, start, end, &prev);
 		if (distance[end] == INFTY) {
 			printf("Do trazenog cvora je nemoguce doci\n");
 			return;
@@ -198,7 +199,7 @@ void shortestPath(int** graph, int nodes, int* cost) {
 				j = i;
 				i = prev[i];
 			}
-			graph[start][j] = graph[j][start] = INFTY;
+			tmpGraph[start][j] = tmpGraph[j][start] = INFTY;
 		}
 	}
 	printf("Putanja od cvora %d do cvora %d: %d", start, end, end);
