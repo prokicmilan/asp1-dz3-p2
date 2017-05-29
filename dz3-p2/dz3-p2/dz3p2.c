@@ -172,7 +172,7 @@ void shortestPath(int** graph, int nodes, int* cost) {
 		return;
 	}
 	cpyGraph(&tmpGraph, graph, nodes);
-	printf("Unesite pocetni i krajnji cvor i sumu novca koji je na raspolaganju: ");
+	printf("Unesite pocetni i krajnji cvor i koliko novca je na raspolaganju: ");
 	scanf("%d%d%d", &start, &end, &money);
 	if (start < 0 || start >= nodes || end < 0 || end >= nodes) {
 		printf("Nepostojeci cvorovi\n");
